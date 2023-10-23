@@ -3,7 +3,6 @@ import { Quiz } from "../interfaces/quiz";
 import { Question, QuestionType } from "../interfaces/question";
 import { QuizList } from "./QuizList";
 import { AddQuizModal } from "./AddQuizModal";
-
 import "./Quizzer.css";
 import sample from "../data/quizzes.json";
 
@@ -31,6 +30,13 @@ export const Quizzer = () => {
     }
 
     function addQuiz(title: string, body: string) {
+        const newQuiz = {
+            id: quizzes.length + 1,
+            title: title,
+            body: body,
+            published: false,
+            questionList: [] as Question[]
+        };
         setQuizzes([...quizzes, newQuiz]);
     }
 
@@ -54,18 +60,16 @@ export const Quizzer = () => {
                 handleClose={handleCloseModal}
                 addQuiz={addQuiz}
             ></AddQuizModal>
-            <hr />
-            <h2 style={{ color: "white" }}>Application Sketch</h2>
-            {/* <img src={require("./sketchFINAL.jpg")} /> */}
+
             <hr />
             <div style={{ color: "white" }}>
+            <h2>Application Sketch</h2>
+            <hr />
                 <h2>Completed Features</h2>
                 <ul className="completedList">
                     <li>
-                        {" "}
                         Users can see a list of quizzes, including the quizzes
-                        title, description, and how many questions it has
-                        (TESTED)
+                        title, description, and how many questions it has (TESTED)
                     </li>
                     <li>
                         Users can select a specific quiz to see the questions,
@@ -80,22 +84,17 @@ export const Quizzer = () => {
                         and be told if they are correct (TESTED)
                     </li>
                     <li>
-                        Users can see how many total points they have earned
-                        (TESTED)
+                        Users can see how many total points they have earned (TESTED)
                     </li>
                     <li>
-                        Users can clear out their existing answers for a quiz
-                        (TESTED)
+                        Users can clear out their existing answers for a quiz (TESTED)
                     </li>
                     <li>Users can publish or unpublish a question (TESTED)</li>
                     <li>
                         Users can filter the questions in a list so that only
                         published questions are shown (TESTED)
                     </li>
-                    <li>
-                        Users can edit the questions and fields of a quiz
-                        (TESTED)
-                    </li>
+                    <li>Users can edit the questions and fields of a quiz (TESTED)</li>
                     <li>Users can add a new quiz question (TESTED)</li>
                     <li>Users can delete an existing quiz question (TESTED)</li>
                     <li>Users can reorder quiz questions (TESTED)</li>

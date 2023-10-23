@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button, Form } from "react-bootstrap";
 import { Question, QuestionType } from "../interfaces/question";
 
 import "./QuestionEdit.css";
@@ -10,13 +11,20 @@ export const QuestionEdit = ({
     editQuestion,
     removeQuestion,
     swapQuestion
-}: {}) => {
-    const [a, b] = useState<number>(
+}: {
+    index: number;
+    lastIndex: number;
+    question: Question;
+    editQuestion: (questionId: number, newQuestion: Question) => void;
+    removeQuestion: (questionId: number) => void;
+    swapQuestion: (idx1: number, idx2: number) => void;
+}) => {
+    const [selectedAns, setSelectedAns] = useState<number>(
         question.options.findIndex((s: string) => question.expected === s)
     );
 
     const handleNumOptions = (e: React.ChangeEvent<HTMLInputElement>) => {
-        b(0);
+        setSelectedAns(0);
         const newNum =
             parseInt(e.target.value) < 1 ? 1 : parseInt(e.target.value);
         editQuestion(question.id, {
@@ -27,8 +35,14 @@ export const QuestionEdit = ({
         });
     };
 
+    const handleSwitch = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newType = e.target.value as QuestionType;
+        if (newType === "multiple_choice_question") switchMulti();
+        if (newType === "short_answer_question") switchShortAns();
+    };
+
     const switchMulti = () => {
-        b(0);
+        setSelectedAns(0);
         editQuestion(question.id, {
             ...question,
             type: "multiple_choice_question",
@@ -37,9 +51,20 @@ export const QuestionEdit = ({
         });
     };
 
+    const switchShortAns = () => {
+        editQuestion(question.id, {
+            ...question,
+            type: "short_answer_question",
+            expected: "Example Answer",
+            options: []
+        });
+    };
+
     const handlePoints = (e: React.ChangeEvent<HTMLInputElement>) => {
-    	question.points = parseInt(e.target.value)
-        editQuestion(question.id, question);
+        editQuestion(question.id, {
+            ...question,
+            points: parseInt(e.target.value) < 0 ? 0 : parseInt(e.target.value)
+        });
     };
 
     const handleChoiceChange = (
@@ -51,13 +76,13 @@ export const QuestionEdit = ({
         editQuestion(question.id, {
             ...question,
             options: newOptions,
-            expected: a === i ? e.target.value : question.expected
+            expected: selectedAns === i ? e.target.value : question.expected
         });
     };
 
     const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const idx = parseInt(e.target.value);
-        b(idx);
+        setSelectedAns(idx);
         editQuestion(question.id, {
             ...question,
             expected: question.options[idx]
@@ -74,10 +99,12 @@ export const QuestionEdit = ({
                         <Form.Group
                             className="title_input"
                             controlId="editTitleFormId"
+                            
+
                         >
                             <Form.Control
+                                data-testid = "edit_question_title"
                                 value={question.body}
-                                data-testid="edit_question_title"
                                 onChange={(
                                     e: React.ChangeEvent<HTMLInputElement>
                                 ) => {
@@ -93,11 +120,13 @@ export const QuestionEdit = ({
                         <Form.Group
                             className="points_input"
                             controlId="editPointsFormId"
+
                         >
                             <Form.Control
                                 value={question.points}
                                 type="number"
                                 onChange={handlePoints}
+
                             ></Form.Control>
                         </Form.Group>
                         <h4>pt{question.points !== 1 ? "s" : ""}</h4>
@@ -113,20 +142,10 @@ export const QuestionEdit = ({
                                     value={question.type}
                                     onChange={handleSwitch}
                                 >
-                                    <option
-                                        data-testid={
-                                            "question_type_dropdown_" + index
-                                        }
-                                        value="multiple_choice_question"
-                                    >
+                                    <option value="multiple_choice_question" data-testid="question_type_dropdown_0">
                                         Multiple Choice
                                     </option>
-                                    <option
-                                        data-testid={
-                                            "question_type_dropdown_" + index
-                                        }
-                                        value="short_answer_question"
-                                    >
+                                    <option value="short_answer_question">
                                         Short Answer
                                     </option>
                                 </Form.Select>
@@ -177,7 +196,7 @@ export const QuestionEdit = ({
                                                         "questionChoice" + index
                                                     }
                                                     value={i}
-                                                    checked={a === i}
+                                                    checked={selectedAns === i}
                                                     onChange={handleRadioChange}
                                                 />
                                                 <Form.Control
@@ -225,9 +244,9 @@ export const QuestionEdit = ({
                 <div className="edit_question_footer">
                     <Form.Check
                         className="published_question_check"
-                        data-testid="question_published_check"
                         type="checkbox"
-                        id="is_question_published_check"
+                        id="is-question_published_check"
+                        data-testid = "question_published_check"
                         label="Published"
                         checked={question.published}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

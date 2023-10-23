@@ -12,7 +12,14 @@ export const QuizQuestion = ({
     handleSubmit,
     addPoints,
     editQuestionSub
-}: {}) => {
+}: {
+    index: number;
+    question: Question;
+    submitted: boolean;
+    handleSubmit: (index: number) => void;
+    addPoints: (p: number) => void;
+    editQuestionSub: (questionId: number, newAns: string) => void;
+}) => {
     const handleClick = (e: ChangeEvent) => {
         if (!submitted) {
             editQuestionSub(question.id, e.target.value);
@@ -22,7 +29,7 @@ export const QuizQuestion = ({
     const handleSubmitClick = () => {
         handleSubmit(index);
         if (question.submission === question.expected) {
-            addPoints(5);
+            addPoints(question.points);
         }
     };
 
@@ -31,18 +38,18 @@ export const QuizQuestion = ({
             <hr />
             <div className="question">
                 <div className="question_header">
-                    <h4 data-testid="question_body">
+                    <h4 data-testid = "question_body">
                         {index + 1}. {question.body}
                     </h4>
                     <h4>
                         {question.points} pt{question.points !== 1 ? "s" : ""}
                     </h4>
-                </div>f
+                </div>
                 <div className="answer_box">
                     {question.type === "short_answer_question" && (
                         <Form.Group controlId="formShortAnswerBox">
                             <Form.Control
-                                data-testid="select-option"
+                            data-testid = "select-option"
                                 value={question.submission}
                                 onChange={handleClick}
                             ></Form.Control>
@@ -53,13 +60,14 @@ export const QuizQuestion = ({
                             {question.options.map(
                                 (option: string, i: number) => (
                                     <Form.Check
-                                        type=""
+                                        type="radio"
                                         name={"questionChoice" + index}
                                         key={option + " | " + i}
                                         label={option}
                                         value={option}
                                         checked={question.submission === option}
                                         onChange={handleClick}
+                                        data-testid="question_body"
                                     />
                                 )
                             )}
